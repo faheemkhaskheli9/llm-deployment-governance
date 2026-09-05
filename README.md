@@ -4,7 +4,7 @@
 > This is an original, from-scratch build. It is not affiliated with, and does not
 > contain any code, prompts, data, or business logic from, any employer or client.
 
-![status](https://img.shields.io/badge/status-planned-lightgrey)
+![status](https://img.shields.io/badge/status-in--progress-yellow)
 ![python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
@@ -85,6 +85,8 @@ cd llm-deployment-governance
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt   # or: pip install -e .
 cp .env.example .env              # fill in API keys / config
+python manage.py migrate          # SQLite by default; set DATABASE_URL for Postgres
+python manage.py runserver
 ```
 
 ## 8. Dataset
