@@ -2,20 +2,35 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Django: runserver",
+            "name": "Python: Current File",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/manage.py",
-            "args": ["runserver"],
-            "django": true,
+            "program": "${file}",
+            "console": "integratedTerminal",
             "justMyCode": true
         },
         {
-            "name": "Python: pytest",
+            "name": "Python: Debug Tests (pytest)",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": ["tests/"],
+            "args": [
+                "tests",
+                "-v"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Python: Django runserver",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver"
+            ],
+            "django": true,
             "console": "integratedTerminal",
             "justMyCode": true
         }
