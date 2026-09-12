@@ -1,6 +1,6 @@
 """Regression tests for issue #3: environment/pipeline stage data model."""
 import pytest
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, transaction
 
 from governance.models import EnvironmentStage, PromptVersion
 
@@ -54,12 +54,19 @@ def test_version_stage_cannot_reference_a_nonexistent_stage():
     # transaction is validated, so the failing UPDATE and the explicit
     # constraint check both need to sit inside the same pytest.raises to
     # catch the violation regardless of backend (Postgres raises on save()
-    # itself; SQLite raises on check_constraints()).
+    # itself; SQLite raises on check_constraints()). The whole attempt also
+    # has to run inside its own transaction.atomic() so that, when it fails,
+    # only that savepoint (and the invalid row/pending FK violation it
+    # created) gets rolled back — otherwise the deferred SQLite violation
+    # would still be sitting there when the outer test transaction is torn
+    # down, and on Postgres the failed save() would otherwise poison the
+    # rest of the connection for the remainder of the test.
     v = PromptVersion.objects.create_version(key="k", prompt_text="hello")
     v.stage_id = 999999
     with pytest.raises(IntegrityError):
-        v.save(update_fields=["stage"])
-        connection.check_constraints()
+        with transaction.atomic():
+            v.save(update_fields=["stage"])
+            connection.check_constraints()
 
 
 def test_duplicate_stage_slug_rejected_at_db_level():
